@@ -24,23 +24,41 @@ energy = st.slider("현재 에너지 수준 (1-10)", 1, 10, 5)
 # -----------------------------
 # 시간대별 루틴 추천
 # -----------------------------
+st.title("✨ AI 오늘의 추천 루틴")
+
+# 사용자 입력
+emotion = st.selectbox("현재 감정 상태를 선택해주세요:", ["기쁨", "평범함", "피곤함", "스트레스", "불안"])
+energy = st.slider("현재 에너지 수준 (0~10)", 0, 10, 5)
+
 st.header("2️⃣ 오늘의 시간대별 추천 루틴")
-result = ""
+
 if st.button("추천 받기"):
     prompt = f"""
-    사용자의 현재 감정은 {emotion}, 에너지 수준은 {energy}입니다.
-    오늘 하루를 아침(06-10), 점심(11-14), 오후(15-18), 저녁(19-22) 4개 시간대로 나누어,
-    각 시간대에 맞는 활동 1~2개씩 추천하고, 간단한 이유를 알려주세요.
+    사용자의 감정은 '{emotion}'이고 에너지 수준은 {energy}입니다.
+    오늘 하루를 다음 4개 시간대로 나누어,
+    - 아침(06~10)
+    - 점심(11~14)
+    - 오후(15~18)
+    - 저녁(19~22)
+
+    각 시간대에 맞는 추천 활동을 1~2개씩 제안하고,
+    간단한 이유도 함께 설명해주세요.
+    출력은 깔끔한 bullet 형식으로 주세요.
     """
+
     try:
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",  # gpt-4 권한 없으면 gpt-3.5-turbo 사용
-            messages=[{"role":"user","content":prompt}],
-            max_tokens=400,
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",   # 무료 계정도 사용 가능
+            messages=[
+                {"role": "system", "content": "당신은 루틴 추천 전문가입니다."},
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=500,
             temperature=0.7
         )
-        result = response.choices[0].message.content
+        result = response.choices[0].message["content"]
         st.success(result)
+
     except Exception as e:
         st.error(f"추천 루틴 생성 중 오류 발생: {e}")
 
@@ -77,3 +95,4 @@ if today_feedback:
         st.info(feedback_result)
     except Exception as e:
         st.error(f"AI 피드백 생성 중 오류 발생: {e}")
+
