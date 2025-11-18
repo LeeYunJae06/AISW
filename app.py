@@ -38,7 +38,7 @@ energy = st.slider("현재 에너지 수준 (1-10)", 1, 10, 5)
 st.header("2️⃣ 오늘의 시간대별 추천 루틴")
 if st.button("추천 받기"):
     prompt = f"""
-    사용자의 현재 감정은 '{emotion}', 에너지 수준은 {energy}입니다.
+    사용자의 현재 감정은 {emotion}, 에너지 수준은 {energy}입니다.
     오늘 하루를 아침(06-10), 점심(11-14), 오후(15-18), 저녁(19-22) 4개 시간대로 나누어,
     각 시간대에 맞는 활동 1~2개씩 추천하고, 간단한 이유를 알려주세요.
     """
@@ -96,3 +96,4 @@ if today_feedback.strip():
 # 피드백 출력
 if st.session_state.feedback_result:
     st.info(st.session_state.feedback_result)
+
