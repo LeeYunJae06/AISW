@@ -1,19 +1,13 @@
 import streamlit as st
 from openai import OpenAI
-from dotenv import load_dotenv
-import os
 
 # -----------------------------
-# .env 파일 불러오기
+# OpenAI API 키 직접 입력
 # -----------------------------
-load_dotenv()
+# 여기에 본인의 API 키를 입력
+API_KEY = "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"
 
-# API 키 로드
-api_key = os.getenv("OPENAI_API_KEY")
-if not api_key:
-    st.error("❌ OPENAI_API_KEY가 .env에 설정되지 않았습니다.")
-else:
-    client = OpenAI(api_key=api_key)
+client = OpenAI(api_key=API_KEY)
 
 # -----------------------------
 # 페이지 설정
@@ -58,7 +52,7 @@ if st.button("추천 받기"):
             max_tokens=500
         )
 
-        # ✅ 최신 SDK 방식
+        # 최신 SDK 방식
         result = response.choices[0].message.content
         st.success(result)
 
@@ -101,9 +95,10 @@ if today_feedback:
             max_tokens=400
         )
 
-        # ✅ 최신 SDK 방식
+        # 최신 SDK 방식
         feedback_result = feedback_response.choices[0].message.content
         st.info(feedback_result)
 
     except Exception as e:
         st.error(f"AI 피드백 생성 중 오류 발생: {e}")
+
