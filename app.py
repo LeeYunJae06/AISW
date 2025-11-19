@@ -1,12 +1,19 @@
-# app.py
 import streamlit as st
-import openai
+from openai import OpenAI
+from dotenv import load_dotenv
 import os
 
 # -----------------------------
-# OpenAI API 키 설정
+# .env 파일 불러오기
 # -----------------------------
-openai.api_key = os.getenv("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")
+load_dotenv()
+
+# API 키 로드
+api_key = os.getenv("OPENAI_API_KEY")
+if not api_key:
+    st.error("❌ OPENAI_API_KEY가 .env에 설정되지 않았습니다.")
+else:
+    client = OpenAI(api_key=api_key)
 
 # -----------------------------
 # 페이지 설정
@@ -24,43 +31,40 @@ energy = st.slider("현재 에너지 수준 (1-10)", 1, 10, 5)
 # -----------------------------
 # 시간대별 루틴 추천
 # -----------------------------
-st.title("✨ AI 오늘의 추천 루틴")
-
-# 사용자 입력
-emotion = st.selectbox("현재 감정 상태를 선택해주세요:", ["기쁨", "평범함", "피곤함", "스트레스", "불안"])
-energy = st.slider("현재 에너지 수준 (0~10)", 0, 10, 5)
-
 st.header("2️⃣ 오늘의 시간대별 추천 루틴")
 
 if st.button("추천 받기"):
     prompt = f"""
     사용자의 감정은 '{emotion}'이고 에너지 수준은 {energy}입니다.
-    오늘 하루를 다음 4개 시간대로 나누어,
+
+    오늘 하루를 다음 4개 시간대로 나누어:
     - 아침(06~10)
     - 점심(11~14)
     - 오후(15~18)
     - 저녁(19~22)
 
-    각 시간대에 맞는 추천 활동을 1~2개씩 제안하고,
-    간단한 이유도 함께 설명해주세요.
-    출력은 깔끔한 bullet 형식으로 주세요.
+    각 시간대에 적합한 활동 1~2개씩 추천하고
+    짧은 이유도 설명해줘.
+    bullet 형식으로 출력.
     """
 
     try:
         response = client.chat.completions.create(
-            model="gpt-4o-mini",   # 무료 계정도 사용 가능
+            model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": "당신은 루틴 추천 전문가입니다."},
                 {"role": "user", "content": prompt}
             ],
-            max_tokens=500,
-            temperature=0.7
+            max_tokens=500
         )
-        result = response.choices[0].message["content"]
+
+        # ✅ 최신 SDK 방식
+        result = response.choices[0].message.content
         st.success(result)
 
     except Exception as e:
         st.error(f"추천 루틴 생성 중 오류 발생: {e}")
+        result = ""
 
 # -----------------------------
 # 하루 회고
@@ -69,8 +73,8 @@ st.header("3️⃣ 하루 회고")
 today_feedback = st.text_area("오늘 하루를 돌아보며 느낀 점과 성장을 입력하세요.")
 
 if st.button("회고 저장"):
-    if result == "":
-        st.warning("먼저 루틴 추천을 받아주세요.")
+    if today_feedback.strip() == "":
+        st.warning("회고 내용을 입력해주세요.")
     else:
         st.success("회고가 저장되었습니다!")
 
@@ -78,21 +82,30 @@ if st.button("회고 저장"):
 # AI 회고 분석
 # -----------------------------
 st.header("4️⃣ AI 피드백")
+
 if today_feedback:
     feedback_prompt = f"""
-    사용자가 작성한 오늘 회고: {today_feedback}
-    위 회고를 바탕으로 오늘 잘한 점과 개선할 점을 요약하고,
-    내일 시도할 수 있는 시간대별 루틴을 추천해 주세요.
+    사용자가 작성한 회고: {today_feedback}
+
+    1) 오늘 잘한 점  
+    2) 개선할 점  
+    3) 내일 적용 가능한 시간대별 루틴
+
+    위 내용을 정리해서 출력하세요.
     """
+
     try:
-        feedback_response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[{"role":"user","content":feedback_prompt}],
-            max_tokens=400,
-            temperature=0.7
+        feedback_response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[{"role": "user", "content": feedback_prompt}],
+            max_tokens=400
         )
+
+        # ✅ 최신 SDK 방식
         feedback_result = feedback_response.choices[0].message.content
         st.info(feedback_result)
+
     except Exception as e:
         st.error(f"AI 피드백 생성 중 오류 발생: {e}")
+
 
