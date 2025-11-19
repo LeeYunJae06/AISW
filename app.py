@@ -6,7 +6,7 @@ from openai import OpenAI
 # -----------------------------
 # 여기에 본인의 API 키를 입력
 
-client = OpenAI(api_key="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")
+client = OpenAI(api_key="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")
 
 # -----------------------------
 # 페이지 설정
@@ -100,6 +100,8 @@ if today_feedback:
 
     except Exception as e:
         st.error(f"AI 피드백 생성 중 오류 발생: {e}")
+
+
 
 
 
