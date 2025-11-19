@@ -5,9 +5,8 @@ from openai import OpenAI
 # OpenAI API 키 직접 입력
 # -----------------------------
 # 여기에 본인의 API 키를 입력
-API_KEY = "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"
 
-client = OpenAI(api_key=API_KEY)
+client = OpenAI(api_key="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")
 
 # -----------------------------
 # 페이지 설정
