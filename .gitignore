@@ -1,0 +1,7 @@
+# Streamlit secrets (절대 업로드 금지)
+.streamlit/secrets.toml
+
+# Python 기본
+__pycache__/
+*.pyc
+.env
